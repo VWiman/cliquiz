@@ -9,6 +9,9 @@ function shuffle(arr) {
 function norm(s) {
 	return s.trim().replace(/\s+/g, " ");
 }
+
+const TOKEN = String.raw`(?:\S+|"[^"]+"|'[^']+')`;
+
 // Accept either exact string(s) or a custom validator
 function makeQ(prompt, answersOrValidator) {
 	if (typeof answersOrValidator === "function") {
@@ -22,18 +25,32 @@ function makeQ(prompt, answersOrValidator) {
 const baseQuestions = [
 	// CLI
 	makeQ("CLI: Visa nuvarande katalogs fullständiga sökväg", ["pwd"]),
-	makeQ("CLI: Byt katalog", ["cd"]),
+	makeQ("CLI: Byt katalog (katalognamn)", (input) => {
+		return new RegExp(`^cd\\s+${TOKEN}$`).test(norm(input));
+	}),
 	makeQ("CLI: Lista filer och kataloger", ["ls"]),
-	makeQ("CLI: Skapa ny katalog", ["mkdir"]),
-	makeQ("CLI: Skapa en tom fil", ["touch"]),
-	makeQ("CLI: Ta bort filer/kataloger rekursivt utan att fråga", ["rm -rf"]),
-	makeQ("CLI: Flytta eller döp om fil/katalog", ["mv"]),
-	makeQ("CLI: Skriv ut innehållet i en fil", ["cat"]),
+	makeQ("CLI: Skapa ny katalog (katalognamn)", (input) => {
+		return new RegExp(`^mkdir\\s+${TOKEN}(?:\\s+${TOKEN})*$`).test(norm(input));
+	}),
+	makeQ("CLI: Skapa en tom fil (filnamn)", (input) => {
+		return new RegExp(`^touch\\s+${TOKEN}$`).test(norm(input));
+	}),
+	makeQ("CLI: Ta bort filer/kataloger rekursivt utan att fråga (namn)", (input) => {
+		return new RegExp(`^rm -rf\\s+${TOKEN}(?:\\s+${TOKEN})*$`).test(norm(input));
+	}),
+	makeQ("CLI: Flytta eller döp om fil/katalog (källa mål)", (input) => {
+		return new RegExp(`^mv\\s+${TOKEN}\\s+${TOKEN}$`).test(norm(input));
+	}),
+	makeQ("CLI: Skriv ut innehållet i en fil (filnamn)", (input) => {
+		return new RegExp(`^cat\\s+${TOKEN}(?:\\s+${TOKEN})*$`).test(norm(input));
+	}),
 	makeQ("CLI: Rensa terminalen", ["clear"]),
 	makeQ("CLI: Kör som administratör (Super User Do)", ["sudo"]),
 
 	// Git
-	makeQ("Git: Klona ett repo från GitHub", ["git clone"]),
+	makeQ("Git: Klona ett repo från GitHub (url)", (input) => {
+		return new RegExp(`^git clone\\s+${TOKEN}$`).test(norm(input));
+	}),
 	makeQ("Git: Visa status", ["git status"]),
 	makeQ("Git: Lägg till ALLT i staging area", ["git add ."]),
 	makeQ('Git: Skapa en commit med ett meddelande (använd -m "Kommentar")', (input) => {
@@ -43,11 +60,11 @@ const baseQuestions = [
 	makeQ("Git: Ladda upp commits till remote", ["git push"]),
 	makeQ("Git: Hämta och sammanfoga senaste ändringar", ["git pull"]),
 	makeQ("Git: Visa commit-historik", ["git log"]),
-	makeQ("Git: Byt till en annan branch (name-of-branch)", (input) => {
-		return /^git checkout [^\s]+$/.test(norm(input));
+	makeQ("Git: Byt till en annan branch (branch-namn)", (input) => {
+		return new RegExp(`^git checkout\\s+${TOKEN}$`).test(norm(input));
 	}),
-	makeQ("Git: Skapa ny branch och byt till den (name-of-branch)", (input) => {
-		return /^git checkout -b [^\s]+$/.test(norm(input));
+	makeQ("Git: Skapa ny branch och byt till den (branch-namn)", (input) => {
+		return new RegExp(`^git checkout -b\\s+${TOKEN}$`).test(norm(input));
 	}),
 
 	// Vim
@@ -60,6 +77,7 @@ const baseQuestions = [
 	makeQ("Vim: Spara och stäng fil", [":wq"]),
 	makeQ("Vim: Stäng fil utan att spara", [":q!"]),
 ];
+
 
 // --- State ---
 let questions = [];
@@ -127,7 +145,7 @@ function start() {
 	questions = shuffle([...baseQuestions]);
 	score = 0;
 	index = 0;
-    outputEl.innerHTML = `
+	outputEl.innerHTML = `
     <div class="line">📖 Skriv det exakta kommandot. (Enter för att skicka)</div>
     <div class="line">Tips: Syntax räknas. Mellanslag, flaggor och citattecken! Katalog är ett annat ord för mapp.</div>
     <div class="line">Obs: Om frågan innehåller (filnamn) eller (branch-namn) ska du ersätta det med ett eget namn.</div>
