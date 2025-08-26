@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>CLI, Git & Vim – Kommandoträning</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+
+    <body>
+        <main class="wrap">
+            <section class="terminal">
+                <header class="term-header">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                    <div class="title">CLI, Git & Vim – Kommandoträning</div>
+                </header>
+
+                <div class="term-body" id="output">
+                    <div class="line">📖 Skriv det exakta kommandot. (Enter för att skicka)</div>
+                    <div class="line">Tips: Syntax räknas. Mellanslag, flaggor och citattecken! Katalog är ett annat ord
+                        för mapp.</div>
+                    <div class="line">Obs: Om frågan innehåller (filnamn) eller (branch-namn) ska du ersätta det med ett
+                        eget namn.</div>
+                    <div class="line">&nbsp;</div>
+                </div>
+
+                <form class="prompt" id="form">
+                    <label id="questionLabel" for="answerInput" class="q"></label>
+                    <div class="input-row">
+                        <span class="caret">></span>
+                        <input id="answerInput" type="text" autocomplete="off" spellcheck="false" />
+                    </div>
+                    <div class="meta">
+                        <span id="progress">Fråga 0/0</span>
+                        <span id="score">Poäng: 0</span>
+                    </div>
+                    <div class="actions">
+                        <button type="submit" class="btn">Skicka</button>
+                        <button type="button" id="skipBtn" class="btn btn-ghost">Hoppa över</button>
+                        <button type="button" id="restartBtn" class="btn btn-outline">Starta om</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+
+        <script src="app.js"></script>
+    </body>
+
+</html>
