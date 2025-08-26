@@ -12,7 +12,6 @@ function norm(s) {
 
 const TOKEN = String.raw`(?:\S+|"[^"]+"|'[^']+')`;
 
-// Accept either exact string(s) or a custom validator
 function makeQ(prompt, answersOrValidator) {
 	if (typeof answersOrValidator === "function") {
 		return { q: prompt, validate: answersOrValidator };
